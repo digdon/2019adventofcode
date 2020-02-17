@@ -1,4 +1,4 @@
-package day_07;
+package day_09;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,13 +9,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class Day07_Part2 {
+import day_09.IntCodeComputer.Status;
+
+public class Day07_Part2_Redux {
 
     private static List<Integer[]> combinations = new ArrayList<>();
     
     public static void main(String[] args) {
         // Load the program from input
-        List<Integer> codeArray = new ArrayList<>();
+        List<Long> codeArray = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String inputLine = null;
 
@@ -24,7 +26,7 @@ public class Day07_Part2 {
                 String[] split = inputLine.split("\\s*,\\s*");
                 
                 for (int i = 0; i < split.length; i++) {
-                    codeArray.add(new Integer(split[i]));
+                    codeArray.add(new Long(split[i]));
                 }
             }
         } catch (Exception ex) {
@@ -42,13 +44,13 @@ public class Day07_Part2 {
 
         // Set up computers
         int maxComputers = 5;
-        List<Queue<Integer>> queueList = new ArrayList<>(maxComputers);
+        List<Queue<Long>> queueList = new ArrayList<>(maxComputers);
         
         for (int i = 0; i < maxComputers; i++) {
             queueList.add(new LinkedList<>());
         }
 
-        Integer[] program = new Integer[codeArray.size()];
+        Long[] program = new Long[codeArray.size()];
         program = codeArray.toArray(program);
 
         IntCodeComputer[] computers = new IntCodeComputer[maxComputers];
@@ -62,13 +64,13 @@ public class Day07_Part2 {
         generatePhaseSettings();
 //        combinations = new ArrayList<>();
 //        combinations.add(new Integer[] {9, 8, 7, 6, 5});
-        int maxSignal = 0;
+        long maxSignal = 0;
         Integer[] maxPhase = null;
 
         for (Integer[] phaseList : combinations) {
             System.out.print("Combination list:");
             for (int i = 0; i < phaseList.length; i++) {
-                computers[i].initialize();
+                computers[i].reset();
                 computers[i].inputValue(phaseList[i]);
                 System.out.print(" " + phaseList[i]);
             }
@@ -77,21 +79,21 @@ public class Day07_Part2 {
 
             // Input starting signal value
             computers[0].inputValue(0);
-            
-            ProgramStatus status = ProgramStatus.FAILURE;
+
+            Status status = Status.FAILURE;
             
             do {
                 for (int i = 0; i < computers.length; i++) {
-                    status = computers[i].executeProgram();
+                    status = computers[i].execute();
                     
-                    if (status == ProgramStatus.FAILURE) {
+                    if (status == Status.FAILURE) {
                         System.out.println("Program failure on computer " + i);
                         System.exit(-1);
                     }
                 }
-            } while (status != ProgramStatus.SUCCESS);
+            } while (status != Status.SUCCESS);
 
-            Integer poll = queueList.get(0).poll();
+            Long poll = queueList.get(0).poll();
             
             if (poll > maxSignal) {
                 maxSignal = poll;
