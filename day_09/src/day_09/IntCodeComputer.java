@@ -118,6 +118,7 @@ public class IntCodeComputer {
 
     /**
      * Add two values and store the result
+     * 
      * @param paramModes
      * @return
      */
@@ -135,6 +136,7 @@ public class IntCodeComputer {
 
     /**
      * Multiply two values and store the result
+     * 
      * @param paramModes
      * @return
      */
@@ -152,6 +154,7 @@ public class IntCodeComputer {
 
     /**
      * Read in a value and store it
+     * 
      * @return
      */
     private Status opCode3(List<String> paramModes) {
@@ -177,16 +180,17 @@ public class IntCodeComputer {
 
     /**
      * Output memory location
+     * 
      * @param paramModes
      * @return
      */
     private Status opCode4(List<String> paramModes) {
         long value = getMemoryValue(paramModes, 1, pc + 1);
 
-        System.out.println("Output value: " + value);
-        
         if (outputQueue != null) {
             outputQueue.add(value);
+        } else {
+            System.out.println("Output value: " + value);
         }
 
         pc += 2;
@@ -195,7 +199,8 @@ public class IntCodeComputer {
     }
 
     /**
-     * Jump if true (value != 0)
+     * Jump if true (test value != 0)
+     * 
      * @param paramModes
      * @return
      */
@@ -213,7 +218,8 @@ public class IntCodeComputer {
     }
     
     /**
-     * Jump if false (value = 0)
+     * Jump if false (test value = 0)
+     * 
      * @param paramModes
      * @return
      */
@@ -232,6 +238,7 @@ public class IntCodeComputer {
 
     /**
      * Less than (value1 < value2)
+     * 
      * @param paramModes
      * @return
      */
@@ -254,6 +261,7 @@ public class IntCodeComputer {
 
     /**
      * Equals (value1 = value2)
+     * 
      * @param paramModes
      * @return
      */
@@ -276,6 +284,7 @@ public class IntCodeComputer {
     
     /**
      * Modify relative base
+     * 
      * @param paramModes
      * @return
      */
@@ -287,7 +296,17 @@ public class IntCodeComputer {
         
         return Status.SUCCESS;
     }
-    
+
+    /**
+     * Fetch a value from memory, in either positional, immediate, or relative mode.
+     * For positional and relative modes, if the target memory location is beyond the current
+     * size of the program (and active memory), memory will be automatically expanded.
+     * 
+     * @param paramModes
+     * @param paramNum
+     * @param tempPc
+     * @return
+     */
     private long getMemoryValue(List<String> paramModes, int paramNum, int tempPc) {
         Long value = null;
         
@@ -298,9 +317,11 @@ public class IntCodeComputer {
             int address = 0;
             
             if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1).charAt(0) == '2') {
+                // Relative
                 int relAddr = memory[tempPc].intValue();
                 address = (relativeBase + relAddr);
             } else {
+                // Positional
                 address = memory[tempPc].intValue();
             }
             
@@ -319,7 +340,15 @@ public class IntCodeComputer {
         
         return value;
     }
-    
+
+    /**
+     * Set the specified memory location to the given value. If the target memory location
+     * is beyond the current size of the program (and active memory), memory will be
+     * automatically expanded.
+     * 
+     * @param address
+     * @param value
+     */
     private void setMemoryValue(int address, long value) {
         if (address >= memory.length) {
             // Need to extend memory
@@ -329,14 +358,24 @@ public class IntCodeComputer {
         
         memory[address] = value;
     }
-    
+
+    /**
+     * Get a memory address. Memory can be addressed in either relative or positional mode.
+     * 
+     * @param paramModes
+     * @param paramNum
+     * @param tempPc
+     * @return
+     */
     private int getMemoryAddress(List<String> paramModes, int paramNum, int tempPc) {
         int address = 0;
         
         if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1).charAt(0) == '2') {
+            // Relative
             int relAddr = memory[tempPc].intValue();
             address = (relativeBase + relAddr);
         } else {
+            // Positional
             address = memory[tempPc].intValue();
         }
 
