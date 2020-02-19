@@ -9,7 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import day_09.IntCodeComputer.Status;
+import aoc2019.IntCodeComputer;
+import aoc2019.IntCodeComputer.Status;
 
 public class Day07_Part2_Redux {
 
