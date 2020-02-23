@@ -54,6 +54,10 @@ public class IntCodeComputer {
         return outputQueue.poll();
     }
     
+    public Queue<Long> getOutputQueue() {
+        return outputQueue;
+    }
+    
     public Status execute() {
         while (true) {
             long instruction = memory[pc];
