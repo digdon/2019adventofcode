@@ -12,7 +12,6 @@ values. This worked for the first couple of examples (again), but multi-depth na
 I was pretty sure some breadth-first technique (using a queue) was going to be required, but I just could wrap my head around
 it.
 
-Eventually I had to look for a hint. I eventually found this on Reddit - [Day 14: Space Stoichiometry]
-(https://github.com/jeffjeffjeffrey/advent-of-code/blob/master/2019/day_14.ipynb) - and it gave me enough hints to proceed.
+Eventually I had to look for a hint. I eventually found this on Reddit - [Day 14: Space Stoichiometry](https://github.com/jeffjeffjeffrey/advent-of-code/blob/master/2019/day_14.ipynb) - and it gave me enough hints to proceed.
 
 As with day 12, I absolutely consider this a cheat....
