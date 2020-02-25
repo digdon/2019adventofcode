@@ -24,13 +24,14 @@ public class Day02 {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            System.exit(-1);
         }
         
         try {
             reader.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            System.exit(-1);
         }
         
         System.out.println(codeArray);

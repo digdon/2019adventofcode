@@ -38,13 +38,14 @@ public class Day11 {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            System.exit(-1);
         }
         
         try {
             reader.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            System.exit(-1);
         }
         
         Long[] program = new Long[codeArray.size()];
@@ -80,15 +81,18 @@ public class Day11 {
             }
         }
 
+        // Using min/max values, construct an array to hold the data
         int[][] painting = new int[maxX - minX + 1][maxY - minY + 1];
-        
+
+        // Paint the panels
         for (String key : panelMap.keySet()) {
             String[] split = key.split(",");
             int x = Integer.valueOf(split[0]) - minX;
             int y = Integer.valueOf(split[1]) - minY;
             painting[x][y] = panelMap.get(key);
         }
-        
+
+        // Print out the array - it's rotated and backwards, so orient accordingly
         for (int x = painting.length - 1; x >= 0; x--) {
             for (int y = painting[x].length - 1; y >= 0; y--) {
                 System.out.print(painting[x][y] == BLACK ? " " : "#");
