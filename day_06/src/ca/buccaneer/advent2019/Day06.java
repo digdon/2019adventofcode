@@ -42,12 +42,13 @@ public class Day06 {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            System.exit(-1);
         } finally {
             try {
                 reader.close();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
+                System.exit(-1);
             }
         }
 

@@ -27,8 +27,10 @@ public class Day01 {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
+            System.exit(-1);
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
+            System.exit(-1);
         }
         
         try {
@@ -36,8 +38,8 @@ public class Day01 {
                 reader.close();
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            System.exit(-1);
         }
         
         System.out.println(moduleFuelSum);

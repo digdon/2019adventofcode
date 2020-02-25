@@ -28,13 +28,14 @@ public class Day10 {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            System.exit(-1);
         }
         
         try {
             reader.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            System.exit(-1);
         }
 
         int maxAsteroids = 0;

@@ -34,13 +34,14 @@ public class Day05 {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            System.exit(-1);
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
+                    System.exit(-1);
                 }
             }
         }
