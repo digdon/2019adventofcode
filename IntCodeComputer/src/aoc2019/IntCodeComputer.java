@@ -1,6 +1,11 @@
 package aoc2019;
 
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +23,7 @@ public class IntCodeComputer {
     private Long[] memory;
     private int pc = 0;
     private int relativeBase = 0;
+    private Status lastStatus = Status.READY;
 
     public IntCodeComputer(Long[] program, Queue<Long> inputQueue, Queue<Long> outputQueue) {
         this.origProgram = program;
@@ -30,6 +36,7 @@ public class IntCodeComputer {
         memory = Arrays.copyOf(origProgram, origProgram.length);
         pc = 0;
         relativeBase = 0;
+        lastStatus = Status.READY;
     }
 
     public void displayMemory() {
@@ -108,15 +115,19 @@ public class IntCodeComputer {
                     
                 case 99:    // End of program
                     pc = 0;
-                    return Status.SUCCESS;
+                    lastStatus = Status.SUCCESS;
+                    return lastStatus;
                     
                 default:
                     System.out.println("System error - unknown opcode " + opCode);
-                    return Status.FAILURE;
+                    lastStatus = Status.FAILURE;
+                    return lastStatus;
             }
 
+            lastStatus = status;
+            
             if (status != Status.SUCCESS) {
-                return status;
+                return lastStatus;
             }
         }
     }
@@ -385,5 +396,37 @@ public class IntCodeComputer {
         }
 
         return address;
+    }
+    
+    public static Long[] loadProgramFromInput(InputStream is) {
+        // Load the program from input
+        List<Long> codeArray = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String inputLine = null;
+
+        try {
+            while ((inputLine = reader.readLine()) != null) {
+                String[] split = inputLine.split("\\s*,\\s*");
+                
+                for (int i = 0; i < split.length; i++) {
+                    codeArray.add(new Long(split[i]));
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.exit(-1);
+        }
+        
+        try {
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        
+        Long[] program = new Long[codeArray.size()];
+        program = codeArray.toArray(program);
+        
+        return program;
     }
 }

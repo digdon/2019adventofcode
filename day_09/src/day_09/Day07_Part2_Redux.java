@@ -1,8 +1,5 @@
 package day_09;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -17,32 +14,7 @@ public class Day07_Part2_Redux {
     private static List<Integer[]> combinations = new ArrayList<>();
     
     public static void main(String[] args) {
-        // Load the program from input
-        List<Long> codeArray = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String inputLine = null;
-
-        try {
-            while ((inputLine = reader.readLine()) != null) {
-                String[] split = inputLine.split("\\s*,\\s*");
-                
-                for (int i = 0; i < split.length; i++) {
-                    codeArray.add(new Long(split[i]));
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        }
-        
-        try {
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-        
-        System.out.println(codeArray);
+        Long[] program = IntCodeComputer.loadProgramFromInput(System.in);
 
         // Set up computers
         int maxComputers = 5;
@@ -51,9 +23,6 @@ public class Day07_Part2_Redux {
         for (int i = 0; i < maxComputers; i++) {
             queueList.add(new LinkedList<>());
         }
-
-        Long[] program = new Long[codeArray.size()];
-        program = codeArray.toArray(program);
 
         IntCodeComputer[] computers = new IntCodeComputer[maxComputers];
         
