@@ -22,7 +22,6 @@ public class Day16 {
             try {
                 reader.close();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -79,9 +78,11 @@ public class Day16 {
         for (int i = 0; i < vector.length; i++) {
             vector[i] = (shortenedSignal.charAt(i) - '0') % 10;
         }
-        
+
+        // Now we process the vector 100 times
         for (int phase = 0; phase < 100; phase++) {
             for (int pos = vector.length - 2; pos >= 0; pos--) {
+                // Each position is a summation of the positions after it
                 vector[pos] = (vector[pos] + vector[pos + 1]) % 10;
             }
         }
