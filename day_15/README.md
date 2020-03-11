@@ -9,9 +9,9 @@ nodes, yet not the location of the oxygen sensor.
 
 Thinking I had an error in my DFS, I hand-built a 2-dimensional array and modified my DFS function to process it. Once I
 proved that my code was correct, I knew it had to something to do with the commands I was sending to the robot. Again,
-everything looked correct and, in fact it was. The problem was that after sending to command to move back to a previous
-position, I wasn't checking the output queue. This meant that output was queuing up and being processed incorrectly. As
-soon as I cleared the output queue after moving back a position, everything worked.
+everything looked correct and, in fact, it was. The problem was that after sending the command to move back to a previous
+position, I wasn't checking the computer output queue. This meant that output was queuing up and being processed incorrectly.
+As soon as I cleared the output queue after moving back a position, everything worked.
 
 Part 2 turned out to be slightly trickier than I wanted. I wanted to avoid creating objects for everything (even though I
 should have!). As a result, working backwards from the location of the oxygen sensor proved impossible. Luckily, as part
