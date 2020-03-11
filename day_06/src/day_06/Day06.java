@@ -1,4 +1,4 @@
-package ca.buccaneer.advent2019;
+package day_06;
 
 import java.io.BufferedReader;
 import java.io.IOException;

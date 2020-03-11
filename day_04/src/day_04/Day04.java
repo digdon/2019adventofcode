@@ -1,4 +1,4 @@
-package ca.buccaneer.advent2019;
+package day_04;
 
 public class Day04 {
 
