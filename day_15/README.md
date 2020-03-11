@@ -16,8 +16,8 @@ soon as I cleared the output queue after moving back a position, everything work
 Part 2 turned out to be slightly trickier than I wanted. I wanted to avoid creating objects for everything (even though I
 should have!). As a result, working backwards from the location of the oxygen sensor proved impossible. Luckily, as part
 of my debug process, I had code to take the map generated from the DFS and turn it into a 2-D array. For part 2, I merely
-generated a clean maze, and then wrote code to perform a BFS from the sensor location to every other point, keeping track
-of the max depth of the nodes as I went (specialized object - sigh).
+generated a clean maze, and then wrote code to perform a flood fill starting from the sensor location to every other point,
+keeping track of the max depth of the nodes as I went (specialized object - sigh).
 
-Part 1 wasn't terribly ugly, but I'm not very happy with part 2. This was a set of puzzles and I'm happy to have gotten
+Part 1 wasn't terribly ugly, but I'm not very happy with part 2. This was a set of tricky puzzles and I'm happy to have gotten
 through it. Definitely need to work on writing nicer code going forward.
