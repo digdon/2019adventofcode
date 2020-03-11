@@ -1,4 +1,4 @@
-package ca.buccaneer.advent2019.day03;
+package day_03;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
