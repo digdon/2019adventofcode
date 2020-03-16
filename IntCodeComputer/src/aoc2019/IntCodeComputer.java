@@ -1,6 +1,5 @@
 package aoc2019;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +15,9 @@ public class IntCodeComputer {
     public enum Status {
         SUCCESS, FAILURE, BLOCKED, READY
     }
+    
+    private static final char MEMORY_IMMEDIATE = '1';
+    private static final char MEMORY_RELATIVE = '2';
     
     private Long[] origProgram;
     private Queue<Long> inputQueue;
@@ -48,7 +50,7 @@ public class IntCodeComputer {
             System.out.print(String.format("%4d ", memory[i]));
         }
         
-        if (memory.length % 10 != 0) {
+        if (memory.length % 20 != 0) {
             System.out.println();
         }
     }
@@ -64,7 +66,7 @@ public class IntCodeComputer {
     public Queue<Long> getOutputQueue() {
         return outputQueue;
     }
-    
+
     public Status execute() {
         while (true) {
             long instruction = memory[pc];
@@ -326,13 +328,13 @@ public class IntCodeComputer {
     private long getMemoryValue(List<String> paramModes, int paramNum, int tempPc) {
         Long value = null;
         
-        if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1).charAt(0) == '1') {
+        if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1).charAt(0) == MEMORY_IMMEDIATE) {
             // Immediate
             value = memory[tempPc];
         } else {
             int address = 0;
             
-            if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1).charAt(0) == '2') {
+            if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1).charAt(0) == MEMORY_RELATIVE) {
                 // Relative
                 int relAddr = memory[tempPc].intValue();
                 address = (relativeBase + relAddr);
@@ -365,7 +367,7 @@ public class IntCodeComputer {
      * @param address
      * @param value
      */
-    private void setMemoryValue(int address, long value) {
+    public void setMemoryValue(int address, long value) {
         if (address >= memory.length) {
             // Need to extend memory
             Long[] temp = Arrays.copyOf(memory, address + 1);
@@ -386,7 +388,7 @@ public class IntCodeComputer {
     private int getMemoryAddress(List<String> paramModes, int paramNum, int tempPc) {
         int address = 0;
         
-        if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1).charAt(0) == '2') {
+        if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1).charAt(0) == MEMORY_RELATIVE) {
             // Relative
             int relAddr = memory[tempPc].intValue();
             address = (relativeBase + relAddr);
