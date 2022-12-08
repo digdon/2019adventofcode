@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
@@ -16,8 +16,8 @@ public class IntCodeComputer {
         SUCCESS, FAILURE, BLOCKED, READY
     }
     
-    private static final char MEMORY_IMMEDIATE = '1';
-    private static final char MEMORY_RELATIVE = '2';
+    private static final long MEMORY_IMMEDIATE = 1;
+    private static final long MEMORY_RELATIVE = 2;
     
     private Long[] origProgram;
     private Queue<Long> inputQueue;
@@ -81,8 +81,13 @@ public class IntCodeComputer {
 
             // Break down instruction into opCode and parameter modes
             int opCode = (int)(instruction % 100);
-            List<String> paramModes = Arrays.asList(String.valueOf(instruction / 100).split(""));
-            Collections.reverse(paramModes);
+            LinkedList<Long> paramModes = new LinkedList<>();
+            long value = instruction / 100;
+            
+            while (value > 0) {
+                paramModes.addLast(value % 10);
+                value /= 10;
+            }
             
             Status status = Status.FAILURE;
             
@@ -148,7 +153,7 @@ public class IntCodeComputer {
      * @param paramModes
      * @return
      */
-    private Status opCode1(List<String> paramModes) {
+    private Status opCode1(List<Long> paramModes) {
         long value1 = getMemoryValue(paramModes, 1, pc + 1);
         long value2 = getMemoryValue(paramModes, 2, pc + 2);
 
@@ -166,7 +171,7 @@ public class IntCodeComputer {
      * @param paramModes
      * @return
      */
-    private Status opCode2(List<String> paramModes) {
+    private Status opCode2(List<Long> paramModes) {
         long value1 = getMemoryValue(paramModes, 1, pc + 1);
         long value2 = getMemoryValue(paramModes, 2, pc + 2);
         
@@ -183,7 +188,7 @@ public class IntCodeComputer {
      * 
      * @return
      */
-    private Status opCode3(List<String> paramModes) {
+    private Status opCode3(List<Long> paramModes) {
         if (inputQueue == null) {
             System.out.println("input queue not defined");
             return Status.FAILURE;
@@ -210,7 +215,7 @@ public class IntCodeComputer {
      * @param paramModes
      * @return
      */
-    private Status opCode4(List<String> paramModes) {
+    private Status opCode4(List<Long> paramModes) {
         long value = getMemoryValue(paramModes, 1, pc + 1);
 
         if (outputQueue != null) {
@@ -230,7 +235,7 @@ public class IntCodeComputer {
      * @param paramModes
      * @return
      */
-    private Status opCode5(List<String> paramModes) {
+    private Status opCode5(List<Long> paramModes) {
         long testValue = getMemoryValue(paramModes, 1, pc + 1);
         long jumpPc = getMemoryValue(paramModes, 2, pc + 2);
 
@@ -249,7 +254,7 @@ public class IntCodeComputer {
      * @param paramModes
      * @return
      */
-    private Status opCode6(List<String> paramModes) {
+    private Status opCode6(List<Long> paramModes) {
         long testValue = getMemoryValue(paramModes, 1, pc + 1);
         long jumpPc = getMemoryValue(paramModes, 2, pc + 2);
 
@@ -268,7 +273,7 @@ public class IntCodeComputer {
      * @param paramModes
      * @return
      */
-    private Status opCode7(List<String> paramModes) {
+    private Status opCode7(List<Long> paramModes) {
         long value1 = getMemoryValue(paramModes, 1, pc + 1);
         long value2 = getMemoryValue(paramModes, 2, pc + 2);
         
@@ -291,7 +296,7 @@ public class IntCodeComputer {
      * @param paramModes
      * @return
      */
-    private Status opCode8(List<String> paramModes) {
+    private Status opCode8(List<Long> paramModes) {
         long value1 = getMemoryValue(paramModes, 1, pc + 1);
         long value2 = getMemoryValue(paramModes, 2, pc + 2);
         
@@ -314,7 +319,7 @@ public class IntCodeComputer {
      * @param paramModes
      * @return
      */
-    private Status opCode9(List<String> paramModes) {
+    private Status opCode9(List<Long> paramModes) {
         long value = getMemoryValue(paramModes, 1, pc + 1);
         relativeBase += value;
 
@@ -333,16 +338,16 @@ public class IntCodeComputer {
      * @param tempPc
      * @return
      */
-    private long getMemoryValue(List<String> paramModes, int paramNum, int tempPc) {
+    private long getMemoryValue(List<Long> paramModes, int paramNum, int tempPc) {
         Long value = null;
         
-        if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1).charAt(0) == MEMORY_IMMEDIATE) {
+        if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1) == MEMORY_IMMEDIATE) {
             // Immediate
             value = memory[tempPc];
         } else {
             int address = 0;
             
-            if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1).charAt(0) == MEMORY_RELATIVE) {
+            if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1) == MEMORY_RELATIVE) {
                 // Relative
                 int relAddr = memory[tempPc].intValue();
                 address = (relativeBase + relAddr);
@@ -393,10 +398,10 @@ public class IntCodeComputer {
      * @param tempPc
      * @return
      */
-    private int getMemoryAddress(List<String> paramModes, int paramNum, int tempPc) {
+    private int getMemoryAddress(List<Long> paramModes, int paramNum, int tempPc) {
         int address = 0;
         
-        if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1).charAt(0) == MEMORY_RELATIVE) {
+        if (paramModes.size() >= paramNum && paramModes.get(paramNum - 1) == MEMORY_RELATIVE) {
             // Relative
             int relAddr = memory[tempPc].intValue();
             address = (relativeBase + relAddr);
