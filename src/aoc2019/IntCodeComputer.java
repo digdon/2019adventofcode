@@ -39,6 +39,14 @@ public class IntCodeComputer {
         pc = 0;
         relativeBase = 0;
         lastStatus = Status.READY;
+        
+        if (inputQueue != null) {
+            inputQueue.clear();
+        }
+        
+        if (outputQueue != null) {
+            outputQueue.clear();
+        }
     }
 
     public void displayMemory() {

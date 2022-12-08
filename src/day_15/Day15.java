@@ -93,7 +93,7 @@ public class Day15 {
             Status status = computer.execute();
             
             if (status != Status.BLOCKED) {
-                System.out.println("Excepted BLOCKED status, but got " + status.toString());
+                System.out.println("Expected BLOCKED status, but got " + status.toString());
                 System.exit(0);
             }
             
