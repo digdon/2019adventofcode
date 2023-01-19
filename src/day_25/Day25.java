@@ -56,5 +56,7 @@ public class Day25 {
             command.chars().forEach(c -> computer.inputValue(c));
             computer.inputValue('\n');
         }
+        
+        scanner.close();
     }
 }
