@@ -16,3 +16,19 @@ Here's a basic breakdown of what the code is doing:
    - for part 1, this means from each key to every other key in the entire grid. For part 2, it's limited to each quadrant
    - we find the distance to each key using a modified "flood fill"
    - as we move along, we keep track of all doors we pass through on the way to a particular key
+1. now we recursively call minSteps, passing in the list of source keys we're currently evaluating, the currently picked up keys, and a cache
+1. now for the memoization part
+   - we generate a hash key using the list of source keys and the current key set
+   - if we find that key in the cache, we return the value
+1. if there's no value in the cache, we
+   - find all of the reachable keys for each source key, using the set of keys we've picked up along the way
+     - we get back a list of items, where each item tells us which source the item is for, the key that's reachable, and the distance (from keyToKeyMap)
+     - the key set is important - if we're at key 'a' and we're trying to get to key 'b', but door 'C' is in the way and we don't have key 'c', then 'b' is deemed unreachable and not included
+   - for each reachable key, we
+     - change the source item to the key, add the key to the key set, and recursively process again
+     - if the returned step count is lower than any previous count, it becomes the new lowest step count
+   - store the lowest step count in the cache
+  
+Along with the memoization stuff, another key part to this solution is that we only walk the grid at the beginning, during the BFS process to calculate key-to-key distances. Once we have the information, the code is then basically processing a compressed graph. That saves having to step through hundreds of empty tiles.
+
+The caching bit makes a difference. For part 1, my puzzle input results in hitting the cache 981079 times. For part 2, it's 7513643 times. That's a loooooot of saved processing.
