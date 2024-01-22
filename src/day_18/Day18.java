@@ -129,7 +129,7 @@ public class Day18 {
                 int mover = reach.mover();
                 char origMoverKey = sourceKeys.get(mover);
                 sourceKeys.set(mover, reach.key());
-                int steps = reach.distance() + minSteps(sourceKeys, currentKeys | (1 << (reach.key() - 1)), cache, keyToKeyMap);
+                int steps = reach.distance() + minSteps(sourceKeys, currentKeys | (1 << (reach.key() - 'a')), cache, keyToKeyMap);
                 
                 if (steps < value) {
                     value = steps;
@@ -159,7 +159,7 @@ public class Day18 {
                     // Already got this one
                     continue;
                 } else if ((collectedKeys & entry.neededKeys()) != entry.neededKeys()) {
-                    // Got all of the needed keys
+                    // Don't have all of the required keys, so not reachable
                     continue;
                 }
                 
