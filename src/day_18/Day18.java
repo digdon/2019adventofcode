@@ -76,8 +76,8 @@ public class Day18 {
     }
     
     private static int calculateSteps(char[][] grid) {
-        Map<Character, Point> keyPositionMap = new HashMap<>();
-        Map<Character, Point> startPositionMap = new HashMap<>();
+        Map<Character, Point> positionMap = new HashMap<>();
+        List<Character> startPositions = new ArrayList<>();
         
         for (int row = 0; row < grid.length; row++) {
             for (int col = 0; col < grid[row].length; col++) {
@@ -85,32 +85,31 @@ public class Day18 {
                 
                 if (ch >= 'a' && ch <= 'z') {
                     // Found a key
-                    keyPositionMap.put(ch, new Point(row, col));
+                    positionMap.put(ch, new Point(row, col));
                 } else if (ch == '@') {
-                    startPositionMap.put((char)('0' + startPositionMap.size()), new Point(row, col));
+                    char value = (char)('0' + startPositions.size());
+                    startPositions.add(value);
+                    positionMap.put(value, new Point(row, col));
                 }
             }
         }
         
-        keyPositionMap.putAll(startPositionMap);
-        
         Map<Character, List<KeyToKey>> keyToKeyMap = new HashMap<>();
 
         // For each key, find the distances to every other key, keeping track of doors in the way
-        for (Entry<Character, Point> entry : keyPositionMap.entrySet()) {
+        for (Entry<Character, Point> entry : positionMap.entrySet()) {
             List<KeyToKey> keyToKeyData = generateKeyToKeyData(grid, entry.getKey(), entry.getValue());
             keyToKeyMap.put(entry.getKey(), keyToKeyData);
         }
         
-        List<Character> startKeys = new ArrayList<>(startPositionMap.keySet());
-        return minSteps(startKeys, 0, new HashMap<>(), keyToKeyMap);
+        return minSteps(startPositions, 0, new HashMap<>(), keyToKeyMap);
     }
     
-    private static int minSteps(List<Character> sourceKeys,
+    private static int minSteps(List<Character> positions,
                                 int currentKeys,
                                 Map<CacheKey, Integer> cache,
                                 Map<Character, List<KeyToKey>> keyToKeyMap) {
-        CacheKey cacheKey = new CacheKey(sourceKeys, currentKeys);
+        CacheKey cacheKey = new CacheKey(positions, currentKeys);
         Integer value = cache.get(cacheKey);
 
         if (value != null) {
@@ -118,7 +117,7 @@ public class Day18 {
             return value;
         }
         
-        List<Reachable> reachableKeys = reachableKeys(sourceKeys, currentKeys, keyToKeyMap);
+        List<Reachable> reachableKeys = reachableKeys(positions, currentKeys, keyToKeyMap);
         
         if (reachableKeys.size() == 0) {
             value = 0;
@@ -127,15 +126,15 @@ public class Day18 {
             
             for (Reachable reach : reachableKeys) {
                 int mover = reach.mover();
-                char origMoverKey = sourceKeys.get(mover);
-                sourceKeys.set(mover, reach.key());
-                int steps = reach.distance() + minSteps(sourceKeys, currentKeys | (1 << (reach.key() - 'a')), cache, keyToKeyMap);
+                char origMoverKey = positions.get(mover);
+                positions.set(mover, reach.key());
+                int steps = reach.distance() + minSteps(positions, currentKeys | (1 << (reach.key() - 'a')), cache, keyToKeyMap);
                 
                 if (steps < value) {
                     value = steps;
                 }
                 
-                sourceKeys.set(mover, origMoverKey);
+                positions.set(mover, origMoverKey);
             }
         }
         
@@ -144,14 +143,14 @@ public class Day18 {
         return value;
     }
     
-    private static List<Reachable> reachableKeys(List<Character> sourceKeys,
+    private static List<Reachable> reachableKeys(List<Character> positions,
                                                  int collectedKeys,
                                                  Map<Character, List<KeyToKey>> keyToKeyMap) {
         List<Reachable> keys = new ArrayList<>();
         
-        for (int i = 0; i < sourceKeys.size(); i++) {
-            Character sourceKey = sourceKeys.get(i);
-            List<KeyToKey> list = keyToKeyMap.get(sourceKey);
+        for (int i = 0; i < positions.size(); i++) {
+            Character pos = positions.get(i);
+            List<KeyToKey> list = keyToKeyMap.get(pos);
             
             for (KeyToKey entry : list) {
                 int temp = (1 << (entry.key() - 'a'));
