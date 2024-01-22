@@ -14,16 +14,34 @@ import java.util.stream.Collectors;
 
 public class Day18 {
     
-    private static final Map<Character, List<KeyToKey>> keyToKeyMap = new HashMap<>();
+    private record Point(int row, int col) {}
+    private record KeyToKey(char key, int neededKeys, int dist) {}
+    private record Item(Point point, int neededKeys) {}
+    private record Reachable(int mover, char key, int distance) {}
+    private record CacheKey(List<Character> keyList, int currentKeys) {}
+    
+    private static final int[][] DIRECTIONS = {
+            { -1, 0 },  // up
+            { 1, 0 },   // down
+            { 0, -1 },  // left
+            { 0, 1 }    // right
+    };
+    
+    private static final char[][] PART2_ALTER = {
+            { '@', '#', '@' },
+            { '#', '#', '#' },
+            { '@', '#', '@' }
+    };
+
+    static int cacheHits = 0;
 
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         List<String> inputLines = reader.lines().collect(Collectors.toList());
         reader.close();
         
-        // Parse the maze, looking for start position(s) and key locations
-        Map<Character, Point> startPosMap = new HashMap<>();
-        Map<Character, Point> keyPositionMap = new HashMap<>();
+        // Parse the input into a maze, looking for the single start position (this becomes important for part 2 later)
+        Point startPoint = null;
         char[][] grid = new char[inputLines.size()][];
         
         for (int row = 0; row < inputLines.size(); row++) {
@@ -34,94 +52,119 @@ public class Day18 {
                 char ch = line.charAt(col);
                 grid[row][col] = ch;
 
+                if (ch == '@') {
+                    startPoint = new Point(row, col);
+                }
+            }
+        }
+
+        // Part 1
+        cacheHits = 0;
+        System.out.println(String.format("Part 1: %d (%d)", calculateSteps(grid), cacheHits));
+        
+        // Alter grid for part 2
+        for (int y = 0; y < PART2_ALTER.length; y++) {
+            for (int x = 0; x < PART2_ALTER[y].length; x++) {
+                int nextRow = startPoint.row() - 1 + y;
+                int nextCol = startPoint.col() - 1 + x;
+                grid[nextRow][nextCol] = PART2_ALTER[y][x];
+            }
+        }
+        
+        cacheHits = 0;
+        System.out.println(String.format("Part 2: %d (%d)", calculateSteps(grid), cacheHits));
+    }
+    
+    private static int calculateSteps(char[][] grid) {
+        Map<Character, Point> keyPositionMap = new HashMap<>();
+        Map<Character, Point> startPositionMap = new HashMap<>();
+        
+        for (int row = 0; row < grid.length; row++) {
+            for (int col = 0; col < grid[row].length; col++) {
+                char ch = grid[row][col];
+                
                 if (ch >= 'a' && ch <= 'z') {
                     // Found a key
                     keyPositionMap.put(ch, new Point(row, col));
                 } else if (ch == '@') {
-                    startPosMap.put((char)('0' + startPosMap.size()), new Point(row, col));
+                    startPositionMap.put((char)('0' + startPositionMap.size()), new Point(row, col));
                 }
             }
         }
         
-        keyPositionMap.putAll(startPosMap);
-        System.out.println(keyPositionMap);
+        keyPositionMap.putAll(startPositionMap);
+        
+        Map<Character, List<KeyToKey>> keyToKeyMap = new HashMap<>();
 
         // For each key, find the distances to every other key, keeping track of doors in the way
         for (Entry<Character, Point> entry : keyPositionMap.entrySet()) {
             List<KeyToKey> keyToKeyData = generateKeyToKeyData(grid, entry.getKey(), entry.getValue());
-//            System.out.println(entry.getKey() + " -> " + keyToKeyData);
             keyToKeyMap.put(entry.getKey(), keyToKeyData);
         }
-
-        // Part 1
-        System.out.println("Part 1: " + minSteps('0', 0, new HashMap<>()));
-        System.out.println(cacheHits);
         
-        // Part 2
-        cacheHits = 0;
-        System.out.println("Part 2: " + minSteps('0', 0, new HashMap<>()));
-        System.out.println(cacheHits);
+        List<Character> startKeys = new ArrayList<>(startPositionMap.keySet());
+        return minSteps(startKeys, 0, new HashMap<>(), keyToKeyMap);
     }
     
-    private record Point(int row, int col) {}
-    private record KeyToKey(char key, int neededKeys, int dist) {}
-    private record Item(Point point, int neededKeys) {}
-    private record Reachable(char key, int distance) {}
-    private record CacheKey(char key, int currentKeys) {}
-    
-    private static final int[][] DIRECTIONS = {
-            { -1, 0 },  // up
-            { 1, 0 },   // down
-            { 0, -1 },  // left
-            { 0, 1 }    // right
-    };
-
-    static int cacheHits = 0;
-    
-    private static int minSteps(char sourceKey, int currentKeys, Map<CacheKey, Integer> cache) {
-        CacheKey cacheKey = new CacheKey(sourceKey, currentKeys);
+    private static int minSteps(List<Character> sourceKeys,
+                                int currentKeys,
+                                Map<CacheKey, Integer> cache,
+                                Map<Character, List<KeyToKey>> keyToKeyMap) {
+        CacheKey cacheKey = new CacheKey(sourceKeys, currentKeys);
         Integer value = cache.get(cacheKey);
 
-        if (value == null) {
-            List<Reachable> reachableKeys = reachableKeys(sourceKey, currentKeys);
-            
-            if (reachableKeys.size() == 0) {
-                value = 0;
-            } else {
-                value = Integer.MAX_VALUE;
-                
-                for (Reachable reach : reachableKeys) {
-                    int steps = reach.distance() + minSteps(reach.key(), currentKeys | (1 << (reach.key() - 1)), cache);
-                    
-                    if (steps < value) {
-                        value = steps;
-                    }
-                }
-            }
-            
-            cache.put(cacheKey, value);
-        } else {
+        if (value != null) {
             cacheHits++;
+            return value;
         }
         
-        return cache.get(cacheKey);
+        List<Reachable> reachableKeys = reachableKeys(sourceKeys, currentKeys, keyToKeyMap);
+        
+        if (reachableKeys.size() == 0) {
+            value = 0;
+        } else {
+            value = Integer.MAX_VALUE;
+            
+            for (Reachable reach : reachableKeys) {
+                int mover = reach.mover();
+                char origMoverKey = sourceKeys.get(mover);
+                sourceKeys.set(mover, reach.key());
+                int steps = reach.distance() + minSteps(sourceKeys, currentKeys | (1 << (reach.key() - 1)), cache, keyToKeyMap);
+                
+                if (steps < value) {
+                    value = steps;
+                }
+                
+                sourceKeys.set(mover, origMoverKey);
+            }
+        }
+        
+        cache.put(cacheKey, value);
+
+        return value;
     }
     
-    private static List<Reachable> reachableKeys(char sourceKey, int collectedKeys) {
+    private static List<Reachable> reachableKeys(List<Character> sourceKeys,
+                                                 int collectedKeys,
+                                                 Map<Character, List<KeyToKey>> keyToKeyMap) {
         List<Reachable> keys = new ArrayList<>();
-        List<KeyToKey> list = keyToKeyMap.get(sourceKey);
         
-        for (KeyToKey entry : list) {
-            int temp = (1 << (entry.key() - 'a'));
-            if ((collectedKeys & temp) == temp) {
-                // Already got this one
-                continue;
-            } else if ((collectedKeys & entry.neededKeys()) != entry.neededKeys()) {
-                // Got all of the needed keys
-                continue;
-            }
+        for (int i = 0; i < sourceKeys.size(); i++) {
+            Character sourceKey = sourceKeys.get(i);
+            List<KeyToKey> list = keyToKeyMap.get(sourceKey);
             
-            keys.add(new Reachable(entry.key(), entry.dist()));
+            for (KeyToKey entry : list) {
+                int temp = (1 << (entry.key() - 'a'));
+                if ((collectedKeys & temp) == temp) {
+                    // Already got this one
+                    continue;
+                } else if ((collectedKeys & entry.neededKeys()) != entry.neededKeys()) {
+                    // Got all of the needed keys
+                    continue;
+                }
+                
+                keys.add(new Reachable(i, entry.key(), entry.dist()));
+            }
         }
         
         return keys;
