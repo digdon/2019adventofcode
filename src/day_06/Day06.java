@@ -124,6 +124,7 @@ public class Day06 {
         return path;
     }
     
+    @SuppressWarnings("unused")
     private static void displayMap(Map<String, Orbit> map) {
         for (Orbit orbit : map.values()) {
             if (orbit.getParent() == null) {
